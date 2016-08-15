@@ -1,0 +1,93 @@
+[RWU_MCMListener]
++ModName="Resistance Weapon Upgrades"
+
++GeneralGroupName="General Settings"
++UpgradesGroupName="Upgrade Weights"
+
+
+
+
+
+
++UpgTierGroupName="Upgrade Tier Appearance Chances"
+
++BscUpgSettingName="Basic Upgrade"
++BscUpgSettingDesc="The likelihood of a basic upgrade appearing on a reward soldier expressed as a percent"
+
++AdvUpgSettingName="Advanced Upgrade"
++AdvUpgSettingDesc="The likelihood of an advanced upgrade appearing on a reward soldier expressed as a percent"
+
++SupUpgSettingName="Superior Upgrade"
++SupUpgSettingDesc="The likelihood of a superior upgrade appearing on a reward soldier expressed as a percent"
+
+
++BscWeightGroupName="Basic Upgrade Weights"
+
++BscCritUpgSettingName="Basic Laser Sight Weight"
++BscCritUpgSettingDesc="The likelihood of a basic upgrade being a Laser Sight relative to the weights of all other basic upgrades"
+
++BscAimUpgSettingName="Basic Scope Weight"
++BscAimUpgSettingDesc="The likelihood of a basic upgrade being a Scope relative to the weights of all other basic upgrades"
+
++BscClipSizeUpgSettingName="Basic Expanded Magazine Weight"
++BscClipSizeUpgSettingDesc="The likelihood of a basic upgrade being an Expanded Magazine relative to the weights of all other basic upgrades"
+
++BscFreeFireUpgSettingName="Basic Hair Trigger Weight"
++BscFreeFireUpgSettingDesc="The likelihood of a basic upgrade being a Hair Trigger relative to the weights of all other basic upgrades"
+
++BscReloadUpgSettingName="Basic Auto-Loader Weight"
++BscReloadUpgSettingDesc="The likelihood of a basic upgrade being an Auto-Loader relative to the weights of all other basic upgrades"
+
++BscMissDamageUpgSettingName="Basic Stock Weight"
++BscMissDamageUpgSettingDesc="The likelihood of a basic upgrade being a Stock relative to the weights of all other basic upgrades"
+
++BscFreeKillUpgSettingName="Basic Repeater Weight"
++BscFreeKillUpgSettingDesc="The likelihood of a basic upgrade being a Repeater relative to the weights of all other basic upgrades"
+
+
++AdvWeightGroupName="Advanced Upgrade Weights"
+
++AdvCritUpgSettingName="Advanced Laser Sight Weight"
++AdvCritUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Laser Sight relative to the weights of all other advanced upgrades"
+
++AdvAimUpgSettingName="Advanced Scope Weight"
++AdvAimUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Scope relative to the weights of all other advanced upgrades"
+
++AdvClipSizeUpgSettingName="Advanced Expanded Magazine Weight"
++AdvClipSizeUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Expanded Magazine relative to the weights of all other advanced upgrades"
+
++AdvFreeFireUpgSettingName="Advanced Hair Trigger Weight"
++AdvFreeFireUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Hair Trigger relative to the weights of all other advanced upgrades"
+
++AdvReloadUpgSettingName="Advanced Auto-Loader Weight"
++AdvReloadUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Auto-Loader relative to the weights of all other advanced upgrades"
+
++AdvMissDamageUpgSettingName="Advanced Stock Weight"
++AdvMissDamageUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Stock relative to the weights of all other advanced upgrades"
+
++AdvFreeKillUpgSettingName="Advanced Repeater Weight"
++AdvFreeKillUpgSettingDesc="The likelihood of an advanced upgrade being an Advanced Repeater relative to the weights of all other advanced upgrades"
+
+
++SupWeightGroupName="Superior Upgrade Weights"
+
++SupCritUpgSettingName="Superior Laser Sight Weight"
++SupCritUpgSettingDesc="The likelihood of a superior upgrade being a Superior Laser Sight relative to the weights of all other superior upgrades"
+
++SupAimUpgSettingName="Superior Scope Weight"
++SupAimUpgSettingDesc="The likelihood of a superior upgrade being a Superior Scope relative to the weights of all other superior upgrades"
+
++SupClipSizeUpgSettingName="Superior Expanded Magazine Weight"
++SupClipSizeUpgSettingDesc="The likelihood of a superior upgrade being a Superior Expanded Magazine relative to the weights of all other superior upgrades"
+
++SupFreeFireUpgSettingName="Superior Hair Trigger Weight"
++SupFreeFireUpgSettingDesc="The likelihood of a superior upgrade being a Superior Hair Trigger relative to the weights of all other superior upgrades"
+
++SupReloadUpgSettingName="Superior Auto-Loader Weight"
++SupReloadUpgSettingDesc="The likelihood of a superior upgrade being a Superior Auto-Loader relative to the weights of all other superior upgrades"
+
++SupMissDamageUpgSettingName="Superior Stock Weight"
++SupMissDamageUpgSettingDesc="The likelihood of a superior upgrade being a Superior Stock relative to the weights of all other superior upgrades"
+
++SupFreeKillUpgSettingName="Superior Repeater Weight"
++SupFreeKillUpgSettingDesc="The likelihood of a superior upgrade being a Superior Repeater relative to the weights of all other superior upgrades"

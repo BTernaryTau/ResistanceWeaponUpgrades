@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Default" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Guid>96be025e-976a-40fb-afc8-212cd4cfff49</Guid>
+    <Name>ResistanceWeaponUpgrades</Name>
+    <Description>Gives soldiers earned as rewards or bought from the black market a chance to have a weapon upgrade already applied when they appear in the armory.</Description>
+    <SteamPublishID>0</SteamPublishID>
+    <AssemblyName>ResistanceWeaponUpgrades</AssemblyName>
+    <RootNamespace>ResistanceWeaponUpgrades</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="Config\" />
+    <Folder Include="Content\" />
+    <Folder Include="Localization\" />
+    <Folder Include="Src\" />
+    <Folder Include="Src\ResistanceWeaponUpgrades\" />
+    <Folder Include="Src\ResistanceWeaponUpgrades\Classes\" />
+    <Folder Include="Src\ModConfigMenuAPI" />
+    <Folder Include="Src\ModConfigMenuAPI\Classes" />
+    <Folder Include="Src\LW_Tuple" />
+    <Folder Include="Src\LW_Tuple\Classes" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Config\XComRWU_Defaults.ini">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="ReadMe.txt" />
+    <Content Include="ModPreview.jpg" />
+    <Content Include="Config\XComEditor.ini" />
+    <Content Include="Config\XComEngine.ini" />
+    <Content Include="Config\XComGame.ini" />
+    <Content Include="Localization\XComGame.int" />
+    <Content Include="Localization\ResistanceWeaponUpgrades.int" />
+    <Content Include="Src\ResistanceWeaponUpgrades\Classes\ResistanceWeaponUpgrades_StoredConfig.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ResistanceWeaponUpgrades\Classes\RWU_Defaults.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ResistanceWeaponUpgrades\Classes\RWU_MCMListener.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ResistanceWeaponUpgrades\Classes\RWU_Utilities.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ResistanceWeaponUpgrades\Classes\X2DownloadableContentInfo_ResistanceWeaponUpgrades.uc" />
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Button.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Checkbox.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Dropdown.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Instance.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Label.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Setting.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_SettingsGroup.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_SettingsPage.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Slider.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\Classes\MCM_API_Spinner.uc">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\MCM_API_CfgHelpers.uci">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\ModConfigMenuAPI\MCM_API_Includes.uci">
+      <SubType>Content</SubType>
+    </Content>
+    <Content Include="Src\LW_Tuple\Classes\LWTuple.uc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildLocalExtensionPath)\XCOM2.targets" />
+</Project>
