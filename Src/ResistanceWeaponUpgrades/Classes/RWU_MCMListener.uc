@@ -11,19 +11,22 @@ var config int UpgradeChance;
 
 var config bool GrimyMode;
 
-var config array<name> ResistanceUpgrades;
+var config array<UpgradeSettings> ResistanceUpgrades;
 
-var array<string> UpgradeSpinnerValues;
+var string ChanceDropdownValue;
 
-var array<MCM_API_Spinner> UpgradeSpinners;
+var MCM_API_Dropdown ChanceDropdown;
+
+var array<string> UpgradeDropdownValues;
+
+var array<MCM_API_Dropdown> UpgradeDropdowns;
 
 var array<X2WeaponUpgradeTemplate> TemplateArray;
 
-var array<string> SpinnerOptions;
-
 var localized string ModName, GeneralGroupName;
-var localized string BasicUpgradesGroupName, AdvancedUpgradesGroupName, SuperiorUpgradesGroupName, PrototypeUpgradesGroupName, OtherUpgradesGroupName;
-var localized string UpgradeSpinnerDesc;
+var localized string BasicUpgradesGroupName, AdvancedUpgradesGroupName, SuperiorUpgradesGroupName;
+var localized string PrototypeUpgradesGroupName, OtherUpgradesGroupName;
+var localized string ChanceDropdownName, ChanceDropdownDesc, UpgradeDropdownDesc;
 
 event OnInit(UIScreen Screen)
 {
@@ -33,6 +36,8 @@ event OnInit(UIScreen Screen)
 simulated function ClientModCallback(MCM_API_Instance ConfigAPI, int GameMode)
 {
 	local XComGameState_Item DummyWeapon;
+	local array<string> DropdownOptionsLong;
+	local array<string> DropdownOptionsShort;
 	local int i;
 
 	local MCM_API_SettingsPage Page;
@@ -90,26 +95,34 @@ simulated function ClientModCallback(MCM_API_Instance ConfigAPI, int GameMode)
 		}
 	}
 
-	UpgradeSpinners.Length = 0;
+	for (i = 0; i <= 100; i++)
+		DropdownOptionsLong.AddItem(string(i));
+
+	for (i = 0; i <= 10; i++)
+		DropdownOptionsShort.AddItem(string(i));
+	
+	ChanceDropdown = General.AddDropdown('RWUChanceDropdown', ChanceDropdownName, ChanceDropdownDesc, DropdownOptionsLong, ChanceDropdownValue, ChanceDropdownSaveHandler);
+
+	UpgradeDropdowns.Length = 0;
 
 	for (i = 0; i < TemplateArray.Length; i++)
 	{
 		switch (TemplateArray[i].Tier)
 		{
 			case 0:
-				UpgradeSpinners.AddItem(BasicUpgrades.AddSpinner(name('RWUUpgradeSpinner_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeSpinnerDesc, SpinnerOptions, UpgradeSpinnerValues[i], UpgradeSpinnerSaveHandler));
+				UpgradeDropdowns.AddItem(BasicUpgrades.AddDropdown(name('RWUUpgradeDropdown_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeDropdownDesc, DropdownOptionsShort, UpgradeDropdownValues[i], UpgradeDropdownSaveHandler));
 				break;
 			case 1:
-				UpgradeSpinners.AddItem(AdvancedUpgrades.AddSpinner(name('RWUUpgradeSpinner_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeSpinnerDesc, SpinnerOptions, UpgradeSpinnerValues[i], UpgradeSpinnerSaveHandler));
+				UpgradeDropdowns.AddItem(AdvancedUpgrades.AddDropdown(name('RWUUpgradeDropdown_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeDropdownDesc, DropdownOptionsShort, UpgradeDropdownValues[i], UpgradeDropdownSaveHandler));
 				break;
 			case 2:
-				UpgradeSpinners.AddItem(SuperiorUpgrades.AddSpinner(name('RWUUpgradeSpinner_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeSpinnerDesc, SpinnerOptions, UpgradeSpinnerValues[i], UpgradeSpinnerSaveHandler));
+				UpgradeDropdowns.AddItem(SuperiorUpgrades.AddDropdown(name('RWUUpgradeDropdown_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeDropdownDesc, DropdownOptionsShort, UpgradeDropdownValues[i], UpgradeDropdownSaveHandler));
 				break;
 			case 3:
-				UpgradeSpinners.AddItem(PrototypeUpgrades.AddSpinner(name('RWUUpgradeSpinner_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeSpinnerDesc, SpinnerOptions, UpgradeSpinnerValues[i], UpgradeSpinnerSaveHandler));
+				UpgradeDropdowns.AddItem(PrototypeUpgrades.AddDropdown(name('RWUUpgradeDropdown_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeDropdownDesc, DropdownOptionsShort, UpgradeDropdownValues[i], UpgradeDropdownSaveHandler));
 				break;
 			default:
-				UpgradeSpinners.AddItem(OtherUpgrades.AddSpinner(name('RWUUpgradeSpinner_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeSpinnerDesc, SpinnerOptions, UpgradeSpinnerValues[i], UpgradeSpinnerSaveHandler));
+				UpgradeDropdowns.AddItem(OtherUpgrades.AddDropdown(name('RWUUpgradeDropdown_' $ i), TemplateArray[i].GetItemFriendlyNameNoStats(), UpgradeDropdownDesc, DropdownOptionsShort, UpgradeDropdownValues[i], UpgradeDropdownSaveHandler));
 		}
 	}
 
@@ -122,75 +135,68 @@ simulated function LoadSavedSettings()
 {
 	local int i;
 
-	UpgradeSpinnerValues.Length = 0;
+	UpgradeDropdownValues.Length = 0;
 
-	/*class'RWU_MCMListener'.static.*/LoadUserConfig();
+	LoadUserConfig();
 	
+	ChanceDropdownValue = string(UpgradeChance);
+
 	for (i = 0; i < TemplateArray.Length; i++)
 	{
-		UpgradeSpinnerValues.AddItem(string(class'RWU_Utilities'.static.GetUpgradeWeight(TemplateArray[i].DataName)));
+		UpgradeDropdownValues.AddItem(string(class'RWU_Utilities'.static.GetUpgradeWeight(TemplateArray[i].DataName)));
 	}
 }
 
-simulated function UpgradeSpinnerSaveHandler(MCM_API_Setting Spinner, string SpinnerValue)
+`MCM_API_BasicDropdownSaveHandler(ChanceDropdownSaveHandler, ChanceDropdownValue)
+
+simulated function UpgradeDropdownSaveHandler(MCM_API_Setting Dropdown, string DropdownValue)
 {
 	local int index;
 	
-	index = int(GetRightMost(Spinner.GetName()));
+	index = int(GetRightMost(Dropdown.GetName()));
 
-	UpgradeSpinnerValues[index] = SpinnerValue;
+	UpgradeDropdownValues[index] = DropdownValue;
 }
 
 simulated function SaveButtonClicked(MCM_API_SettingsPage Page)
 {
-	local int i, j;
+	local UpgradeSettings Settings;
+	local int i;
 
 	ResistanceUpgrades.Length = 0;
 
-	for (i = 0; i < UpgradeSpinnerValues.Length; i++)
+	UpgradeChance = int(ChanceDropdownValue);
+
+	for (i = 0; i < UpgradeDropdownValues.Length; i++)
 	{
-		for (j = 0; j < int(UpgradeSpinnerValues[i]); j++)
-		{
-			ResistanceUpgrades.AddItem(TemplateArray[i].DataName);
-		}
+		Settings.Upgrade = TemplateArray[i].DataName;
+		Settings.Weight = int(UpgradeDropdownValues[i]);
+		ResistanceUpgrades.AddItem(Settings);
 	}
 	
     ConfigVersion = `MCM_CH_GetCompositeVersion();
 	SaveConfig();
 
 	// Allow proper garbage collection of UI elements
-	UpgradeSpinners.Length = 0;
+	ChanceDropdown = none;
+	UpgradeDropdowns.Length = 0;
 }
 
 simulated function ResetButtonClicked(MCM_API_SettingsPage Page)
 {
-	local name UpgradeName;
-	local int Weight, i;
+	local int i;
 
-	for (i = 0; i < UpgradeSpinners.Length; i++)
-	{
-		`LOG(TemplateArray[i].DataName, true, 'ResistanceWeaponUpgrades');
+	ChanceDropdown.SetValue(string(class'RWU_Defaults'.default.UpgradeChance), true);
 
-		Weight = 0;
-
-		foreach class'RWU_Defaults'.default.ResistanceUpgrades(UpgradeName)
-		{
-			if (UpgradeName == TemplateArray[i].DataName)
-			{
-				Weight++;
-				`LOG("Weight =" @ Weight, true, 'ResistanceWeaponUpgrades');
-			}
-		}
-
-		`LOG(TemplateArray[i].DataName @ "has a weight of" @ Weight, true, 'ResistanceWeaponUpgrades');
-		UpgradeSpinners[i].SetValue(string(Weight), true);
-	}
+	for (i = 0; i < UpgradeDropdowns.Length; i++)
+		UpgradeDropdowns[i].SetValue(string(class'RWU_Utilities'.static.GetDefaultUpgradeWeight(TemplateArray[i].DataName)), true);
 }
 
 simulated function RevertButtonClicked(MCM_API_SettingsPage Page)
 {
 	// Allow proper garbage collection of UI elements
-	UpgradeSpinners.Length = 0;
+	ChanceDropdown = none;
+	UpgradeDropdowns.Length = 0;
 }
 
 static function LoadUserConfig()
@@ -198,6 +204,7 @@ static function LoadUserConfig()
 	local array<X2WeaponUpgradeTemplate> TempArray;
 	local array<name> NameArray;
 	local XComGameState_Item DummyWeapon;
+	local UpgradeSettings Settings;
 	local int UserConfigVersion, DefaultConfigVersion, i;
 
 	UserConfigVersion = default.ConfigVersion;
@@ -210,21 +217,34 @@ static function LoadUserConfig()
 
 	TempArray = class'X2ItemTemplateManager'.static.GetItemTemplateManager().GetAllUpgradeTemplates();
 
-	for (i = 0; i < TempArray.Length; i++)
-	{
-		NameArray.AddItem(TempArray[i].DataName);
-	}
-
 	// Set up the dummy weapon
 	DummyWeapon = new class'XComGameState_Item';
 	DummyWeapon.InventorySlot = eInvSlot_PrimaryWeapon;
 
-	// Update ResistanceUpgrades to reflect the removal of valid upgrades
+	for (i = 0; i < TempArray.Length; i++)
+	{
+		if (TempArray[i].CanApplyUpgradeToWeaponFn(new class'X2WeaponUpgradeTemplate', DummyWeapon, 0))
+		{
+			NameArray.AddItem(TempArray[i].DataName);
+		}
+	}
+
+	// Update ResistanceUpgrades to reflect the addition and removal of valid upgrades
+	for (i = 0; i < NameArray.Length; i++)
+	{
+		if (!class'RWU_Utilities'.static.IsListed(NameArray[i]))
+		{
+			`LOG("Adding new weapon upgrade template" @ NameArray[i] @ "to ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
+			Settings.Upgrade = NameArray[i];
+			default.ResistanceUpgrades.AddItem(Settings);
+		}
+	}
+
 	for (i = 0; i < default.ResistanceUpgrades.Length; i++)
 	{
-		if (NameArray.Find(default.ResistanceUpgrades[i]) == INDEX_NONE)
+		if (NameArray.Find(default.ResistanceUpgrades[i].Upgrade) == INDEX_NONE)
 		{
-			`LOG("Removing weapon upgrade template" @ default.ResistanceUpgrades[i] @ "from ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
+			`LOG("Removing weapon upgrade template" @ default.ResistanceUpgrades[i].Upgrade @ "from ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
 			default.ResistanceUpgrades.Remove(i, 1);
 			i--;
 		}
@@ -262,7 +282,5 @@ static function bool UpdateUserConfigValues(out int UserConfigVersion)
 
 defaultproperties
 {
-	SpinnerOptions = ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-
 	ScreenClass = class'MCM_OptionsScreen'
 }

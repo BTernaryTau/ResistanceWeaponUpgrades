@@ -2,9 +2,28 @@
 
 class RWU_Utilities extends Object;
 
-static function bool IsEnabled(name DataName)
+struct UpgradeSettings
 {
-	return class'RWU_MCMListener'.default.ResistanceUpgrades.Find(DataName) != INDEX_NONE;
+	var name Upgrade;
+	var int Weight;
+	
+	structdefaultproperties
+	{
+		Weight = 1;
+	}
+};
+
+static function bool IsListed(name DataName)
+{
+	local int i;
+
+	for (i = 0; i < class'RWU_MCMListener'.default.ResistanceUpgrades.Length; i++)
+	{
+		if (class'RWU_MCMListener'.default.ResistanceUpgrades[i].Upgrade == DataName)
+			return true;
+	}
+
+	return false;
 }
 
 static function bool DoesUpgradeTierExist(array<X2WeaponUpgradeTemplate> TemplateArray, int Tier)
@@ -18,6 +37,39 @@ static function bool DoesUpgradeTierExist(array<X2WeaponUpgradeTemplate> Templat
 	}
 
 	return false;
+}
+
+static function int GetUpgradeWeight(name DataName)
+{
+	local int i;
+
+	for (i = 0; i < class'RWU_MCMListener'.default.ResistanceUpgrades.Length; i++)
+	{
+		if (class'RWU_MCMListener'.default.ResistanceUpgrades[i].Upgrade == DataName)
+		{
+			return class'RWU_MCMListener'.default.ResistanceUpgrades[i].Weight;
+		}
+	}
+
+	`REDSCREEN("GetUpgradeWeight was called for an upgrade not found in ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
+	`LOG("GetUpgradeWeight was called for an upgrade not found in ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
+
+	return 0;
+}
+
+static function int GetDefaultUpgradeWeight(name DataName)
+{
+	local int i;
+
+	for (i = 0; i < class'RWU_Defaults'.default.ResistanceUpgrades.Length; i++)
+	{
+		if (class'RWU_Defaults'.default.ResistanceUpgrades[i].Upgrade == DataName)
+		{
+			return class'RWU_Defaults'.default.ResistanceUpgrades[i].Weight;
+		}
+	}
+
+	return 1;
 }
 
 static function GiveNonCouncilSoldierReward(XComGameState NewGameState, XComGameState_Reward RewardState, optional StateObjectReference AuxRef, optional bool bOrder = false, optional int OrderHours = -1)
@@ -65,107 +117,23 @@ static function GiveNonCouncilSoldierReward(XComGameState NewGameState, XComGame
 
 static function AddRandomUpgrade(XComGameState NewGameState, XComGameState_Unit UnitState)
 {
-	/*local float Random, TotalWeight, CumulativeChance, CumulativeWeight;
-	
-	CumulativeChance = 0;
-	CumulativeWeight = 0;
+	local array<name> WeightedUpgradeArray;
+	local int Random, i, j;
 
-	Random = RandRange(0, 100);
+	Random = `SYNC_RAND_STATIC(100);
 
-	// Not sure if RandRange is inclusive or exclusive; treating it as inclusive just in case
-	while (Random == 100)
-		Random = RandRange(0, 100);
-
-	if (Random < (CumulativeChance+=default.BasicUpgradePercentChance))
+	if (Random < class'RWU_MCMListener'.default.UpgradeChance)
 	{
-		TotalWeight = default.BasicLaserSightWeight + default.BasicScopeWeight + default.BasicExpandedMagazineWeight + default.BasicHairTriggerWeight + default.BasicAutoLoaderWeight + default.BasicStockWeight + default.BasicRepeaterWeight;
+		for (i = 0; i < class'RWU_MCMListener'.default.ResistanceUpgrades.Length; i++)
+		{
+			for (j = 0; j < class'RWU_MCMListener'.default.ResistanceUpgrades[i].Weight; j++)
+				WeightedUpgradeArray.AddItem(class'RWU_MCMListener'.default.ResistanceUpgrades[i].Upgrade);
+		}
 
-		Random = RandRange(0, TotalWeight);
+		Random = `SYNC_RAND_STATIC(WeightedUpgradeArray.Length);
 
-		while (Random == TotalWeight)
-			Random = RandRange(0, TotalWeight);
-
-		if (Random < (CumulativeWeight+=default.BasicLaserSightWeight))
-			AddUpgrade(NewGameState, UnitState, 'CritUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicScopeWeight))
-			AddUpgrade(NewGameState, UnitState, 'AimUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicExpandedMagazineWeight))
-			AddUpgrade(NewGameState, UnitState, 'ClipSizeUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicHairTriggerWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeFireUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicAutoLoaderWeight))
-			AddUpgrade(NewGameState, UnitState, 'ReloadUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicStockWeight))
-			AddUpgrade(NewGameState, UnitState, 'MissDamageUpgrade_Bsc');
-
-		else if (Random < (CumulativeWeight+=default.BasicRepeaterWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeKillUpgrade_Bsc');
+		AddUpgrade(NewGameState, UnitState, WeightedUpgradeArray[Random]);
 	}
-	else if (Random < (CumulativeChance+=default.AdvancedUpgradePercentChance))
-	{
-		TotalWeight = default.AdvancedLaserSightWeight + default.AdvancedScopeWeight + default.AdvancedExpandedMagazineWeight + default.AdvancedHairTriggerWeight + default.AdvancedAutoLoaderWeight + default.AdvancedStockWeight + default.AdvancedRepeaterWeight;
-
-		Random = RandRange(0, TotalWeight);
-
-		while (Random == TotalWeight)
-			Random = RandRange(0, TotalWeight);
-
-		if (Random < (CumulativeWeight+=default.AdvancedLaserSightWeight))
-			AddUpgrade(NewGameState, UnitState, 'CritUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedScopeWeight))
-			AddUpgrade(NewGameState, UnitState, 'AimUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedExpandedMagazineWeight))
-			AddUpgrade(NewGameState, UnitState, 'ClipSizeUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedHairTriggerWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeFireUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedAutoLoaderWeight))
-			AddUpgrade(NewGameState, UnitState, 'ReloadUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedStockWeight))
-			AddUpgrade(NewGameState, UnitState, 'MissDamageUpgrade_Adv');
-
-		else if (Random < (CumulativeWeight+=default.AdvancedRepeaterWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeKillUpgrade_Adv');
-	}
-	else if (Random < (CumulativeChance+=default.SuperiorUpgradePercentChance))
-	{
-		TotalWeight = default.SuperiorLaserSightWeight + default.SuperiorScopeWeight + default.SuperiorExpandedMagazineWeight + default.SuperiorHairTriggerWeight + default.SuperiorAutoLoaderWeight + default.SuperiorStockWeight + default.SuperiorRepeaterWeight;
-
-		Random = RandRange(0, TotalWeight);
-
-		while (Random == TotalWeight)
-			Random = RandRange(0, TotalWeight);
-
-		if (Random < (CumulativeWeight+=default.SuperiorLaserSightWeight))
-			AddUpgrade(NewGameState, UnitState, 'CritUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorScopeWeight))
-			AddUpgrade(NewGameState, UnitState, 'AimUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorExpandedMagazineWeight))
-			AddUpgrade(NewGameState, UnitState, 'ClipSizeUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorHairTriggerWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeFireUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorAutoLoaderWeight))
-			AddUpgrade(NewGameState, UnitState, 'ReloadUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorStockWeight))
-			AddUpgrade(NewGameState, UnitState, 'MissDamageUpgrade_Sup');
-
-		else if (Random < (CumulativeWeight+=default.SuperiorRepeaterWeight))
-			AddUpgrade(NewGameState, UnitState, 'FreeKillUpgrade_Sup');
-	}*/
 }
 
 static function AddUpgrade(XComGameState NewGameState, XComGameState_Unit UnitState, name UpgradeName)
@@ -184,22 +152,22 @@ static function AddUpgrade(XComGameState NewGameState, XComGameState_Unit UnitSt
 	}
 	else
 	{
-		`REDSCREEN("Unable to apply weapon upgrade" @ string(UpgradeName), true, 'ResistanceWeaponUpgrades');
-		`LOG("Unable to apply weapon upgrade" @ string(UpgradeName), true, 'ResistanceWeaponUpgrades');
+		`REDSCREEN("Unable to apply weapon upgrade" @ UpgradeName, true, 'ResistanceWeaponUpgrades');
+		`LOG("Unable to apply weapon upgrade" @ UpgradeName, true, 'ResistanceWeaponUpgrades');
 	}
 }
 
-static function AddGrimyLootItem(XComGameState NewGameState, XComGameState_Unit UnitState)
+/*static function AddGrimyLootItem(XComGameState NewGameState, XComGameState_Unit UnitState)
 {
 	local XComGameState_Item PrimaryWeapon;
 	local LWTuple GrimyTuple;
 	local LWTValue ItemTemplate;
 	//local int Random;
 
-	/*Random = RAND(100);
+	//Random = RAND(100);
 
-	if (Random < GrimyPrimaryChance)
-	{*/
+	//if (Random < GrimyPrimaryChance)
+	//{
 
 	ItemTemplate.kind = LWTVObject;
 	ItemTemplate.o = UnitState.GetPrimaryWeapon().GetMyTemplate();
@@ -231,22 +199,4 @@ static function AddGrimyLootItem(XComGameState NewGameState, XComGameState_Unit 
 
 	UnitState.AddItemToInventory(PrimaryWeapon, eInvSlot_PrimaryWeapon, NewGameState);
 	//}
-}
-
-static function int GetUpgradeWeight(name DataName)
-{
-	local name UpgradeName;
-	local int Weight;
-
-	Weight = 0;
-
-	foreach class'RWU_MCMListener'.default.ResistanceUpgrades(UpgradeName)
-	{
-		if (UpgradeName == DataName)
-		{
-			Weight++;
-		}
-	}
-
-	return Weight;
-}
+}*/
