@@ -28,6 +28,7 @@ static event OnPostTemplatesCreated()
 {
 	local X2StrategyElementTemplateManager Manager;
 	local X2RewardTemplate Template;
+	local array<X2WeaponUpgradeTemplate> BlankArray;
 
 	Manager = class'X2StrategyElementTemplateManager'.static.GetStrategyElementTemplateManager();
 
@@ -38,5 +39,5 @@ static event OnPostTemplatesCreated()
 	Template.GiveRewardFn = class'RWU_Utilities'.static.GiveNonCouncilSoldierReward;
 
 	// Update config values
-	class'RWU_MCMListener'.static.LoadUserConfig();
+	class'RWU_MCMListener'.static.LoadUserConfig(BlankArray);
 }

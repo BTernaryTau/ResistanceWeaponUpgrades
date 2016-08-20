@@ -137,7 +137,7 @@ simulated function LoadSavedSettings()
 
 	UpgradeDropdownValues.Length = 0;
 
-	LoadUserConfig();
+	LoadUserConfig(TemplateArray);
 	
 	ChanceDropdownValue = string(UpgradeChance);
 
@@ -189,7 +189,7 @@ simulated function ResetButtonClicked(MCM_API_SettingsPage Page)
 	ChanceDropdown.SetValue(string(class'RWU_Defaults'.default.UpgradeChance), true);
 
 	for (i = 0; i < UpgradeDropdowns.Length; i++)
-		UpgradeDropdowns[i].SetValue(string(class'RWU_Utilities'.static.GetDefaultUpgradeWeight(TemplateArray[i].DataName)), true);
+		UpgradeDropdowns[i].SetValue(string(class'RWU_Utilities'.static.GetDefaultUpgradeWeight(TemplateArray[i].DataName, TemplateArray[i].Tier)), true);
 }
 
 simulated function RevertButtonClicked(MCM_API_SettingsPage Page)
@@ -199,13 +199,12 @@ simulated function RevertButtonClicked(MCM_API_SettingsPage Page)
 	UpgradeDropdowns.Length = 0;
 }
 
-static function LoadUserConfig()
+static function LoadUserConfig(array<X2WeaponUpgradeTemplate> TempArray)
 {
-	local array<X2WeaponUpgradeTemplate> TempArray;
-	local array<name> NameArray;
 	local XComGameState_Item DummyWeapon;
 	local UpgradeSettings Settings;
-	local int UserConfigVersion, DefaultConfigVersion, i;
+	local int UserConfigVersion, DefaultConfigVersion, i, j;
+	local bool Valid;
 
 	UserConfigVersion = default.ConfigVersion;
 	DefaultConfigVersion = class'RWU_Defaults'.default.ConfigVersion;
@@ -215,34 +214,48 @@ static function LoadUserConfig()
 		return;
 	}
 
-	TempArray = class'X2ItemTemplateManager'.static.GetItemTemplateManager().GetAllUpgradeTemplates();
-
-	// Set up the dummy weapon
-	DummyWeapon = new class'XComGameState_Item';
-	DummyWeapon.InventorySlot = eInvSlot_PrimaryWeapon;
-
-	for (i = 0; i < TempArray.Length; i++)
+	if (TempArray.Length == 0)
 	{
-		if (TempArray[i].CanApplyUpgradeToWeaponFn(new class'X2WeaponUpgradeTemplate', DummyWeapon, 0))
+		TempArray = class'X2ItemTemplateManager'.static.GetItemTemplateManager().GetAllUpgradeTemplates();
+
+		// Set up the dummy weapon
+		DummyWeapon = new class'XComGameState_Item';
+		DummyWeapon.InventorySlot = eInvSlot_PrimaryWeapon;
+
+		// Remove templates that aren't for primary weapons
+		for (i = 0; i < TempArray.Length; i++)
 		{
-			NameArray.AddItem(TempArray[i].DataName);
+			if (!TempArray[i].CanApplyUpgradeToWeaponFn(new class'X2WeaponUpgradeTemplate', DummyWeapon, 0))
+			{
+				TempArray.Remove(i, 1);
+				i--;
+			}
 		}
 	}
 
 	// Update ResistanceUpgrades to reflect the addition and removal of valid upgrades
-	for (i = 0; i < NameArray.Length; i++)
+	for (i = 0; i < TempArray.Length; i++)
 	{
-		if (!class'RWU_Utilities'.static.IsListed(NameArray[i]))
+		if (!class'RWU_Utilities'.static.IsListed(TempArray[i].DataName))
 		{
-			`LOG("Adding new weapon upgrade template" @ NameArray[i] @ "to ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
-			Settings.Upgrade = NameArray[i];
+			`LOG("Adding new weapon upgrade template" @ TempArray[i].DataName @ "to ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
+			Settings.Upgrade = TempArray[i].DataName;
+			Settings.Weight = class'RWU_Utilities'.static.GetDefaultUpgradeWeight(TempArray[i].DataName, TempArray[i].Tier);
 			default.ResistanceUpgrades.AddItem(Settings);
 		}
 	}
 
 	for (i = 0; i < default.ResistanceUpgrades.Length; i++)
 	{
-		if (NameArray.Find(default.ResistanceUpgrades[i].Upgrade) == INDEX_NONE)
+		Valid = false;
+
+		for (j = 0; j < TempArray.Length; j++)
+		{
+			if (TempArray[j].DataName == default.ResistanceUpgrades[i].Upgrade)
+				Valid = true;
+		}
+
+		if (!Valid)
 		{
 			`LOG("Removing weapon upgrade template" @ default.ResistanceUpgrades[i].Upgrade @ "from ResistanceUpgrades", true, 'ResistanceWeaponUpgrades');
 			default.ResistanceUpgrades.Remove(i, 1);

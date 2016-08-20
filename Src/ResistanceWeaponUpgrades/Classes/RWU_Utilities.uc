@@ -57,7 +57,7 @@ static function int GetUpgradeWeight(name DataName)
 	return 0;
 }
 
-static function int GetDefaultUpgradeWeight(name DataName)
+static function int GetDefaultUpgradeWeight(name DataName, int Tier)
 {
 	local int i;
 
@@ -69,7 +69,10 @@ static function int GetDefaultUpgradeWeight(name DataName)
 		}
 	}
 
-	return 1;
+	if (Tier < 0 || Tier > 2)
+		return 1;
+
+	return 3 - Tier;
 }
 
 static function GiveNonCouncilSoldierReward(XComGameState NewGameState, XComGameState_Reward RewardState, optional StateObjectReference AuxRef, optional bool bOrder = false, optional int OrderHours = -1)
