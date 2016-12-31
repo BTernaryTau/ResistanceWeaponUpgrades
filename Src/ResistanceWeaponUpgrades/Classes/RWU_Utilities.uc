@@ -121,11 +121,32 @@ static function GiveNonCouncilSoldierReward(XComGameState NewGameState, XComGame
 static function AddRandomUpgrade(XComGameState NewGameState, XComGameState_Unit UnitState)
 {
 	local array<name> WeightedUpgradeArray;
+	local LWTuple BirthdayTuple;
+	local LWTValue Birthday;
 	local int Random, i, j;
+	local bool bIsBirthday;
+
+	// Increase the chance to get an upgrade and the chance that it's a rarer one if it's the player's birthday
+	BirthdayTuple = new class'LWTuple';
+	BirthdayTuple.Id = 'Birthday';
+	`XEVENTMGR.TriggerEvent('Birthday', BirthdayTuple);
+	bIsBirthday = BirthdayTuple.Data.Length == 1 && BirthdayTuple.Data[0].kind == LWTVBool && BirthdayTuple.Data[0].b;
 
 	Random = `SYNC_RAND_STATIC(100);
 
-	if (Random < class'RWU_MCMListener'.default.UpgradeChance)
+	if (bIsBirthday && Random < class'RWU_MCMListener'.default.UpgradeChance * 0.5 + 50)
+	{
+		for (i = 0; i < class'RWU_MCMListener'.default.ResistanceUpgrades.Length; i++)
+		{
+			if (class'RWU_MCMListener'.default.ResistanceUpgrades[i].Weight != 0)
+				WeightedUpgradeArray.AddItem(class'RWU_MCMListener'.default.ResistanceUpgrades[i].Upgrade);
+		}
+
+		Random = `SYNC_RAND_STATIC(WeightedUpgradeArray.Length);
+
+		AddUpgrade(NewGameState, UnitState, WeightedUpgradeArray[Random]);
+	}
+	else if (Random < class'RWU_MCMListener'.default.UpgradeChance)
 	{
 		for (i = 0; i < class'RWU_MCMListener'.default.ResistanceUpgrades.Length; i++)
 		{
