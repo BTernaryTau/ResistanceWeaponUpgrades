@@ -282,7 +282,7 @@ static function bool UpdateUserConfigValues(out int UserConfigVersion)
 
 		default:
 			`REDSCREEN("Unknown user config version" @ string(UserConfigVersion) @ "cannot be updated", true, 'ResistanceWeaponUpgrades');
-			`LOG("Unknown user config version " @ string(UserConfigVersion) @ "cannot be updated", true, 'ResistanceWeaponUpgrades');
+			`LOG("Unknown user config version" @ string(UserConfigVersion) @ "cannot be updated", true, 'ResistanceWeaponUpgrades');
 			return false;
 	}
 
